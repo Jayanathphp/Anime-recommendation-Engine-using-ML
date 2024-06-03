@@ -60,7 +60,8 @@
   left: 0;
   z-index: 0;
   border-radius: 15px;
-  background: linear-gradient(to right, #31d35c, #2bb7da);
+  /* background: linear-gradient(to right, #31d35c, #2bb7da); */
+  background: linear-gradient(to right, #f436ba, #ff0068);
 
   /* background: -webkit-linear-gradient(left, #003366, #004080, #0059b3, #0073e6); */
   transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -134,7 +135,7 @@ form .field input:focus::placeholder {
 }
 .form-inner form .pass-link a,
 .form-inner form .signup-link a {
-  color: #1a75ff;
+  color: #e5509b;
   text-decoration: none;
 }
 .form-inner form .pass-link a:hover,
@@ -153,7 +154,8 @@ form .btn .btn-layer {
   width: 300%;
   position: absolute;
   left: -100%;
-  background: linear-gradient(to right, #31d35c, #2bb7da);
+  /* background: linear-gradient(to right, #31d35c, #2bb7da); */
+  background: linear-gradient(to right, #f436ba, #ff0068);
 
   border-radius: 15px;
   transition: all 0.4s ease;
@@ -174,4 +176,12 @@ form .btn input[type="submit"] {
   font-size: 20px;
   font-weight: 500;
   cursor: pointer;
+}
+.spinner {
+  position: absolute; /* Position the spinner icon */
+  top: 25%; /* Center it vertically */
+  left: 85%; /* Center it horizontally */
+  font-size: 25px;
+  color: #000;
+  transform: translate(-50%, -50%); /* Center it precisely */
 }

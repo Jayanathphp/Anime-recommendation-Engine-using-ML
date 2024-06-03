@@ -55,5 +55,9 @@ def recommend():
     
     return jsonify(recommendations.to_dict(orient='records'))
 
+@app.route('/feedback')
+def feed():
+    return render_template('feed.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

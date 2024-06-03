@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="profile.css" />
+  </head>
+  <body>
+    <div id="NotifyUser" class="none">Notification message goes here</div>
+    <div class="container">
+      <div id="profileIcon">
+        <img
+          src="data:image/png;base64,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"
+          alt="Profile Icon"
+        />
+      </div>
+      <div id="Loading" style="font-weight: bold"></div>
+      <table id="profileTable">
+        <tr></tr>
+      </table>
+     
+    </div>
+
+    <div class="wishlist none" id="wishlistDiv">
+      <div class="heading">
+        <h3>wishlists</h3>
+      </div>
+      <div class="wishlist-list" id="wishlist-list"></div>
+    </div>
+
+    <script type="module" src="profile.js"></script>
+  </body>
+</html>

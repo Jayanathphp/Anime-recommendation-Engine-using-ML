@@ -1,49 +1,371 @@
-const loginText = document.querySelector(".title-text .login");
-const loginForm = document.querySelector("form.login");
-const loginBtn = document.querySelector("label.login");
-const signupBtn = document.querySelector("label.signup");
-const signupLink = document.querySelector("form .signup-link a");
-const loginForm_div = document.querySelector("#loginForm");
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  connectDB,
+  ref,
+  get,
+  set,
+  child,
+  update,
+} from "./firebaseConnection/firebaseDBconn.js";
 
-const close_icon = document.querySelector(".close");
-close_icon.style.cursor = "pointer";
-close_icon.onclick = () => {
-  overlay1.classList.remove("fade-in");
-  loginForm_div.classList.add("none");
+const auth = getAuth();
+//get user id from session storage
+const userAuthUid = sessionStorage.getItem("userid<@#(1029384756)#@>");
+//sign up form
+const signupPwd = document.querySelector("#signup_password");
+const signupCNFPwd = document.querySelector("#signup_CNFpassword");
+const signupEmail = document.querySelector("#signup_email");
+const signupUName = document.querySelector("#name");
+const signupBtn = document.querySelector("#signup_btn");
+//login form
 
-  overlay1.classList.add("fade-out");
+const loginBtn = document.querySelector("#login_btn");
+const loginPwd = document.querySelector("#login_password");
+const loginEmail = document.querySelector("#login_email");
+
+// Notify function to show success or error messages
+var notifyTimeout;
+
+function NotifyUser(ErrorType, message, duration) {
+  var errorMessage = document.getElementById("NotifyUser");
+
+  // Clear any existing timeout
+  clearTimeout(notifyTimeout);
+
+  errorMessage.innerHTML = "";
+
+  // Set message type and content
+  if (ErrorType === "success") {
+    errorMessage.classList.add("successMessage");
+    errorMessage.innerHTML = `<i class="fa fa-check" style="font-size:20px" aria-hidden="true"></i> ${message}`;
+  } else {
+    errorMessage.classList.add("errorMessage");
+    errorMessage.innerHTML = `<i class="fa fa-exclamation-circle" style="font-size:20px" aria-hidden="true"></i> ${message}`;
+  }
+
+  // Show the message and hide it after the duration
+  errorMessage.classList.remove("none");
+  notifyTimeout = setTimeout(() => {
+    errorMessage.classList.add("none");
+    errorMessage.classList.remove("errorMessage", "successMessage");
+    errorMessage.innerHTML = "";
+  }, duration);
+}
+// Function to save user data to the database
+const saveUserData = (uid, name, email, pwd, mailverification, loginValue) => {
+  set(ref(connectDB, `users/${uid}`), {
+    signupTime: new Date().toString(),
+    lastLoginTime: "Not logged in yet",
+    uid: uid,
+    UserName: name,
+    email: email,
+    password: pwd,
+    emailVerified: mailverification,
+    UserLoggedIn: loginValue,
+  })
+    .then(() => {
+      console.log("User data saved successfully.");
+    })
+    .catch((e) => {
+      console.error("Error saving user data", e);
+    });
 };
 
-overlay1.onclick = () => {
-  overlay1.classList.remove("fade-in");
-  loginForm_div.classList.add("none");
-  anime_details.classList.add("none");
+// Event listener for the signup button
+signupBtn.addEventListener("click", function (event) {
+  event.preventDefault();
+  signupBtn.value = "Loading...";
 
-  overlay1.classList.add("fade-out");
+  const name = signupUName.value;
+  const email = signupEmail.value;
+  const password = signupPwd.value;
+  const confirmPassword = signupCNFPwd.value;
+
+  // Validate form inputs
+  if (password !== confirmPassword) {
+    signupBtn.value = "Sign Up";
+    NotifyUser("error", "Passwords do not match.", 3500);
+  } else if (!name || !email || !password || !confirmPassword) {
+    signupBtn.value = "Sign Up";
+    NotifyUser("error", "Please fill in all required fields.", 3500);
+  } else {
+    // Create new user with email and password
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userdetails) => {
+        signupBtn.value = "Sign Up";
+        signupUName.value = "";
+        signupEmail.value = "";
+        signupPwd.value = "";
+        signupCNFPwd.value = "";
+
+        saveUserData(
+          userdetails.user.uid,
+          name,
+          userdetails.user.email,
+          password,
+          userdetails.user.emailVerified,
+          false
+        );
+        NotifyUser("success", "Signup successful!", 3500);
+
+        // Send email verification
+        sendEmailVerification(auth.currentUser)
+          .then(() => {
+            setTimeout(() => {
+              document.querySelector("label.login").click();
+              NotifyUser(
+                "success",
+                "Verification email sent successfully!",
+                3500
+              );
+            }, 3500);
+          })
+          .catch((e) => {
+            console.error("Error sending verification email", e);
+          });
+      })
+      .catch((e) => {
+        signupBtn.value = "Sign Up";
+        handleAuthError(e);
+      });
+  }
+});
+
+// Event listener for the login button
+loginBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  loginBtn.value = "Loading...";
+  const email = loginEmail.value;
+  const password = loginPwd.value;
+
+  // Validate form inputs
+  if (!email || !password) {
+    loginBtn.value = "Login";
+    NotifyUser("error", "Please fill in all required fields.", 3500);
+  } else {
+    // Sign in with email and password
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userdetails) => {
+        loginBtn.value = "Login";
+        if (!userdetails.user.emailVerified) {
+          alert("Please verify your email to login.");
+          if (confirm("Resend verification email?")) {
+            sendEmailVerification(auth.currentUser)
+              .then(() => {
+                alert("Verification email sent successfully!");
+              })
+              .catch((e) => {
+                console.log("Error sending verification email", e);
+              });
+          }
+        } else {
+          sessionStorage.setItem(
+            "userid<@#(1029384756)#@>",
+            userdetails.user.uid
+          );
+          sessionStorage.setItem("LOgiN#@$%^&;;", true);
+
+          updateUserStatus(userdetails.user.uid, true);
+          getUserData(userdetails.user.uid);
+        }
+      })
+      .catch((e) => {
+        loginBtn.value = "Login";
+        handleAuthError(e);
+      });
+  }
+});
+
+// Function to update user status in the database
+const updateUserStatus = (uid, status) => {
+  update(ref(connectDB, "users/" + uid), {
+    lastLoginTime: new Date().toString(),
+    emailVerified: true,
+    UserLoggedIn: status,
+  })
+    .then(() => {
+      console.log("User status updated.");
+    })
+    .catch((e) => {
+      console.error("Error updating user status", e);
+      NotifyUser("error", `${e}`, 3500);
+    });
 };
 
-document.querySelector("#reg").onclick = () => {
-  overlay1.classList.add("fade-in");
-  loginForm_div.classList.remove("none");
-  anime_details.classList.add("none");
-  overlay1.classList.remove("fade-out");
-};
-document.querySelector("#reg_footer").onclick = () => {
-  overlay1.classList.add("fade-in");
-  loginForm_div.classList.remove("none");
-  anime_details.classList.add("none");
-  overlay1.classList.remove("fade-out");
+// Function to get user data from the database
+const getUserData = (uid) => {
+  get(child(ref(connectDB), "users/" + uid))
+    .then((snapshot) => {
+      const data = snapshot.val();
+      NotifyUser("success", `Welcome, ${data.UserName}`, 3000);
+      updateUIForLoggedInUser(uid, data.UserName);
+    })
+    .catch((e) => {
+      NotifyUser("error", `${e}`, 3500);
+      console.error("Error fetching user data", e);
+    });
 };
 
-signupBtn.onclick = () => {
-  loginForm.style.marginLeft = "-50%";
-  loginText.style.marginLeft = "-50%";
+// Function to handle authentication errors
+const handleAuthError = (e) => {
+  let errorMsg = "";
+  switch (e.code) {
+    case "auth/invalid-email":
+      errorMsg = "Invalid email address.";
+      break;
+    case "auth/weak-password":
+      errorMsg = "password Must be 6 or above characters";
+      break;
+    case "auth/invalid-credential":
+      errorMsg = "invalid credential";
+      break;
+    case "auth/user-disabled":
+      errorMsg =
+        "Your account has been suspended. Please contact the administrator.";
+      break;
+    case "auth/user-not-found":
+      errorMsg = "No user found. Please sign up.";
+      break;
+    case "auth/wrong-password":
+      errorMsg = "Incorrect password.";
+      break;
+    case "auth/network-request-failed":
+      errorMsg = "Network issue. Please try again.";
+      break;
+    case "auth/too-many-requests":
+      errorMsg = "Too many requests. Please try again later.";
+    case "auth/email-already-in-use":
+      errorMsg = "The email address is already in use.";
+      break;
+    default:
+      errorMsg = e.message;
+  }
+  NotifyUser("error", errorMsg, 3500);
 };
-loginBtn.onclick = () => {
-  loginForm.style.marginLeft = "0%";
-  loginText.style.marginLeft = "0%";
+
+// Function to update UI elements for logged in user
+const updateUIForLoggedInUser = (uid, userName) => {
+  if (!uid) {
+    document.querySelector("#reg").innerHTML = `
+      <div id="signuppage" class="button"><a href="#">Login</a></div>
+    `;
+    document.querySelector("#reg_footer").onclick = () => {
+      document.querySelector(".overlay1").classList.add("fade-in");
+      document.querySelector(".overlay1").classList.remove("fade-out");
+      document.querySelector("#loginForm").classList.remove("none");
+    };
+    document.querySelector("#signuppage").onclick = () => {
+      document.querySelector(".overlay1").classList.add("fade-in");
+      document.querySelector(".overlay1").classList.remove("fade-out");
+      document.querySelector("#loginForm").classList.remove("none");
+    };
+  } else {
+    document.querySelector("#reg_footer").classList.add("none");
+    document.querySelector(".overlay1").classList.remove("fade-in");
+    document.querySelector(".overlay1").classList.add("fade-out");
+    document.querySelector("#loginForm").classList.add("none");
+    document.querySelector("#reg").innerHTML = `
+      <div class="profile" id="profile">
+        <div class="img-box">
+          <img src="./static/media/profile.png" alt="Profile Image" />
+        </div>
+      </div>
+      <div class="profile-menu" id="profilemenu">
+        <h4 style="text-align:center">${userName}</h4>
+        <hr>
+        <ul>
+          <li><a href="./static/profile/profile.html"><i class="fa fa-user"></i> Profile</a></li>
+          <li><a href="#" id="signout"><i class="fa fa-sign-out"></i> Sign Out</a></li>
+        </ul>
+      </div>
+    `;
+    document.querySelector("#signout").addEventListener("click", () => {
+      if (confirm("Are you sure you want to log out?")) {
+        signOutUser();
+      }
+    });
+    document.querySelector(".profile").onclick = () => {
+      document.querySelector(".profile-menu").classList.toggle("active");
+    };
+  }
 };
-signupLink.onclick = () => {
-  signupBtn.click();
+
+// Function to sign out user
+const signOutUser = () => {
+  document.querySelector("#reg_footer").classList.remove("none");
+
+  updateUserStatus(userAuthUid, false);
+  sessionStorage.removeItem("userid<@#(1029384756)#@>");
+  sessionStorage.removeItem("LOgiN#@$%^&;;");
+  NotifyUser("success", "Logged out successfully.", 3000);
+  setTimeout(() => location.reload(), 3000);
+};
+
+// Check if user is already authenticated
+if (userAuthUid) {
+  getUserData(userAuthUid);
+} else {
+  updateUIForLoggedInUser(null, null);
+}
+
+// Event listeners for UI elements
+document.querySelector("label.signup").onclick = () => {
+  document.querySelector("form.login").style.marginLeft = "-50%";
+  document.querySelector(".title-text .login").style.marginLeft = "-50%";
+};
+
+document.querySelector("label.login").onclick = () => {
+  document.querySelector("form.login").style.marginLeft = "0%";
+  document.querySelector(".title-text .login").style.marginLeft = "0%";
+};
+
+document.querySelector("form .signup-link a").onclick = () => {
+  document.querySelector("label.signup").click();
   return false;
 };
+
+document.querySelector(".close").onclick = () => {
+  document.querySelector(".overlay1").classList.remove("fade-in");
+  document.querySelector(".overlay1").classList.add("fade-out");
+  document.querySelector("#loginForm").classList.add("none");
+};
+
+document.querySelector(".overlay1").onclick = () => {
+  document.querySelector(".overlay1").classList.add("fade-out");
+  document.querySelector(".overlay1").classList.remove("fade-in");
+  document.querySelector("#loginForm").classList.add("none");
+  document.querySelector("#anime-details").classList.add("none");
+};
+
+//-----------------ADD wishlist----------------------------------------
+const AddtowishList = (animeData, elem, uid) => {
+  // console.log(animeData);
+  const buttonElem = elem.children[0];
+
+  set(ref(connectDB, `users/${uid}/wishlist/${animeData.animeID}`), {
+    animeID: animeData.animeID,
+    animeName: animeData.title,
+    imageURL: animeData.imageUrl,
+    episodes: animeData.episodes,
+    year: animeData.year,
+    popularity: animeData.popularity,
+    TimeStamp: Date(),
+  })
+    .then(() => {
+      // console.log(elem.children[0]);
+      buttonElem.innerHTML = `<i class="fa fa-check" style="font-size:21px" ></i> Added`;
+      buttonElem.setAttribute("disabled", "true");
+      buttonElem.style.cursor = "not-allowed";
+      NotifyUser("success", "Added successfully....", 3000);
+    })
+    .catch((e) => {
+      console.error("Error ", e);
+      NotifyUser("error", "Something Went Wrong.. Please try Again! ", 3000);
+    });
+};
+//-------------------------------------------------
+
+export { AddtowishList, NotifyUser };

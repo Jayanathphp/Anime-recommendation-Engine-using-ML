@@ -3,15 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Anime Recommendation System</title>
+
+    <title>Sakura Suggest</title>
 
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- CSS -->
+
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='log.ico') }}"
+      type="image/x-icon"
     />
 
     <link
@@ -28,10 +35,15 @@
       href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"
     />
   </head>
-  <body>
+
+  <body
+    onoffline=" NotifyUser('error', 'Please Check your Network Connection...', 3500);"
+    ononline="NotifyUser('success', 'Back online !', 2500);"
+  >
     <!-- Overlay -->
     <div class="overlay fade-out glassy"></div>
     <div class="overlay1 fade-out glassy"></div>
+    <div id="NotifyUser" class="none">Notification message goes here</div>
 
     <!-- anime details page -->
 
@@ -54,13 +66,7 @@
             <h3 class="anime-title">Naruto</h3>
             <h4>Anime synopsis</h4>
             <i
-              >Moments before Naruto Uzumaki's birth, a huge demon known as the
-              Nine-Tailed Fox attacked Konohagakure, the Hidden Leaf Village,
-              and wreaked havoc. In order to put an end to the demon's rampage,
-              the leader of the village, the Fourth Hokage, sacrificed his life
-              and sealed the monstrous beast inside the newborn Naruto. In the
-              present, Naruto is a hyperactive and knuckle-headed ninja growing
-              up within Konohagakure. Shunned because of the demon inside him,
+              > Shunned because of the demon inside him,
               Naruto struggles to find his place in the village. His one burning
               desire to become the Hokage and be acknowledged by the villagers
               who despite him. However, while his goal leads him to unbreakable
@@ -103,11 +109,12 @@
           <input type="radio" name="slide" id="login" checked />
           <input type="radio" name="slide" id="signup" />
           <label for="login" class="slide login">Login</label>
-          <label for="signup" class="slide signup">Signup</label>
+          <label for="signup" class="slide signup"> SignUp</label>
           <div class="slider-tab"></div>
         </div>
         <div class="form-inner">
-          <form action="/submit" method="post" class="login">
+          <!-- <form action="/submit" method="post" class="login"> -->
+          <form class="login">
             <div class="field">
               <input
                 type="text"
@@ -127,13 +134,14 @@
             <div class="pass-link"><a href="#">Forgot password?</a></div>
             <div class="field btn">
               <div class="btn-layer"></div>
-              <input type="submit" value="Login" />
+              <input type="submit" value="Login" class="btn" id="login_btn" />
             </div>
             <div class="signup-link">
               Not a member? <a href="">Signup now</a>
             </div>
           </form>
-          <form action="/submit" method="post" class="signup">
+          <form class="signup">
+            <!-- <form action="/submit" method="post" class="signup"> -->
             <div class="field">
               <input
                 type="text"
@@ -160,11 +168,16 @@
               />
             </div>
             <div class="field">
-              <input type="password" placeholder="Confirm password" required />
+              <input
+                type="password"
+                placeholder="Confirm password"
+                id="signup_CNFpassword"
+                required
+              />
             </div>
             <div class="field btn">
               <div class="btn-layer"></div>
-              <input type="submit" value="Signup" />
+              <input type="submit" id="signup_btn" class="btn" value="Signup" />
             </div>
           </form>
         </div>
@@ -178,20 +191,21 @@
           <!-- Logo -->
           <div class="logo">
             <a href="#">
-              <!-- <img src="" alt="Anime " /> -->
-              <h3 style="font-weight: bolder">Anime Recommendation System</h3>
+              <img src="" class="logo-img" alt="Anime " />
             </a>
+            <h3 style="font-weight: bolder">Sakura Suggest</h3>
           </div>
           <!-- Links -->
-          <div class="main-navgation hide-for-mobile">
+          <div class="main-navigation hide-for-mobile">
             <a href="#">Home</a><a href="#container">Get Recommendation</a
-            ><a href="#">About</a><a href="#">Contact</a>
+            ><a href="#">About</a><a id="contact" href="/feedback">Contact</a>
           </div>
 
           <!-- CTA Button -->
-          <a href="#" class="button hide-for-mobile reg_page" id="reg"
-            >sign up</a
-          >
+          <div class="reg_page" id="reg">
+            <!-- <a href="#">Login</a> -->
+          </div>
+
           <!-- Hamburger Menu -->
           <div class="menu hide-for-desktop">
             <span></span>
@@ -214,7 +228,6 @@
             </p>
             <!-- <h1>Anime Recommendation System</h1> -->
             <div class="search-bar">
-              <!-- <form action="/recommend" method="post" id="form"> -->
               <form id="recommendationForm">
                 <input
                   type="text"
@@ -223,7 +236,7 @@
                   name="title"
                   required
                 /><br /><br />
-                <!-- <input type="text" id="title" name="title" required /><br /> -->
+
                 <button type="submit" class="search-btn" id="submit">
                   Get Recommendations
                   <i class="fa" id="spinner" style="font-size: 15px"></i>
@@ -238,9 +251,7 @@
       <section class="recommendations" id="recommendations_section">
         <div class="container">
           <h2>Recommended Anime</h2>
-          <!-- <h2>Top Anime Picks</h2> -->
 
-          <div class="error none" id="error">No recommendation Found</div>
           <div class="anime-list" id="recommendations">
             <!-- <div class="anime-item" id="1" onclick="show_anime_details(this)">
               <img
@@ -338,10 +349,12 @@
           <a href="#">Privacy Policy</a>
         </div>
         <div class="footer-cta">
-          <a href="#" class="button reg_page" id="reg_footer">Sign up</a>
+          <a href="#" class="button reg_page" id="reg_footer"
+            >Sign up / Login</a
+          >
         </div>
         <div class="footer-copyright">
-          <p>© Anime recommendation system. All Rights Reserved</p>
+          <p>© Anime recommendation Engine. All Rights Reserved</p>
         </div>
       </div>
       <div class="attribution">
@@ -375,7 +388,13 @@
         </ul>
       </div>
     </footer>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="{{ url_for('static', filename='loginpage.js') }}"></script>
+    <script
+      type="module"
+      src="{{ url_for('static', filename='script.js') }}"
+    ></script>
+    <script
+      type="module"
+      src="{{ url_for('static', filename='loginpage.js') }}"
+    ></script>
   </body>
 </html>
