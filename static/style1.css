@@ -53,7 +53,8 @@ textarea:focus {
 
 /* Button styles */
 button {
-  background: linear-gradient(to right, #f436ba, #ff0068);
+  /* background-color: #007bff; */
+  background: linear-gradient(to right, #31d35c, #2bb7da);
 
   color: #fff;
   border: none;
@@ -65,7 +66,7 @@ button {
 }
 
 button:hover {
-  background-color: #ff45e0;
+  background-color: #0056b3;
 }
 
 #NotifyUser {

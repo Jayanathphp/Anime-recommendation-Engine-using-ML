@@ -3,6 +3,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
   connectDB,
   ref,
   get,
@@ -54,6 +55,20 @@ function NotifyUser(ErrorType, message, duration) {
     errorMessage.innerHTML = "";
   }, duration);
 }
+//Forgot password
+const ForgotPassword = (email) => {
+  sendPasswordResetEmail(auth, email.value)
+    .then(() => {
+      NotifyUser("success", "Password recovery mail sent successfully ", 3000);
+      email.value = "";
+    })
+    .catch((e) => {
+      NotifyUser("error", e, 3000);
+      console.log(e);
+      handleAuthError(e);
+    });
+};
+
 // Function to save user data to the database
 const saveUserData = (uid, name, email, pwd, mailverification, loginValue) => {
   set(ref(connectDB, `users/${uid}`), {
@@ -167,7 +182,16 @@ loginBtn.addEventListener("click", (e) => {
             userdetails.user.uid
           );
           sessionStorage.setItem("LOgiN#@$%^&;;", true);
-
+          //update user password after reset
+          update(ref(connectDB, "users/" + userdetails.user.uid), {
+            password: password,
+          })
+            .then(() => {
+              console.log("User password updated.");
+            })
+            .catch((e) => {
+              console.error("Error updating user status", e);
+            });
           updateUserStatus(userdetails.user.uid, true);
           getUserData(userdetails.user.uid);
         }
@@ -177,6 +201,12 @@ loginBtn.addEventListener("click", (e) => {
         handleAuthError(e);
       });
   }
+});
+// Event listener for the reset password button
+document.getElementById("Reset_password").addEventListener("click", (e) => {
+  e.preventDefault();
+  const resetpwdMAIL = document.getElementById("Reset_password_mail");
+  ForgotPassword(resetpwdMAIL);
 });
 
 // Function to update user status in the database
@@ -191,7 +221,6 @@ const updateUserStatus = (uid, status) => {
     })
     .catch((e) => {
       console.error("Error updating user status", e);
-      NotifyUser("error", `${e}`, 3500);
     });
 };
 
@@ -300,8 +329,8 @@ const signOutUser = () => {
   updateUserStatus(userAuthUid, false);
   sessionStorage.removeItem("userid<@#(1029384756)#@>");
   sessionStorage.removeItem("LOgiN#@$%^&;;");
-  NotifyUser("success", "Logged out successfully.", 3000);
-  setTimeout(() => location.reload(), 3000);
+  NotifyUser("success", "Logged out successfully.", 2000);
+  setTimeout(() => location.reload(), 2000);
 };
 
 // Check if user is already authenticated
@@ -311,22 +340,45 @@ if (userAuthUid) {
   updateUIForLoggedInUser(null, null);
 }
 
-// Event listeners for UI elements
+// Event listeners for UI elements----------------------------------
 document.querySelector("label.signup").onclick = () => {
+  document.querySelector("form.Forgot-password").classList.add("none");
+  document.querySelector(".title-text .signup").textContent = "SignUp Form";
+
+  document.querySelector("form.signup").classList.remove("none");
   document.querySelector("form.login").style.marginLeft = "-50%";
+
   document.querySelector(".title-text .login").style.marginLeft = "-50%";
 };
 
 document.querySelector("label.login").onclick = () => {
+  document.querySelector("form.signup").classList.add("none");
+  document.querySelector(".title-text .signup").textContent = "SignUp Form";
+
+  document.querySelector("form.Forgot-password").classList.add("none");
+
   document.querySelector("form.login").style.marginLeft = "0%";
   document.querySelector(".title-text .login").style.marginLeft = "0%";
 };
-
+document.querySelector(".pass-link").onclick = () => {
+  document.querySelector("form.Forgot-password").classList.remove("none");
+  document.querySelector("form.login").style.marginLeft = "-50%";
+  document.querySelector(".title-text .login").style.marginLeft = "-50%";
+  document.querySelector(".title-text .signup").textContent = "forgot Password";
+};
+document.querySelector("form .remembered a").onclick = () => {
+  document.querySelector("label.login").click();
+  return false;
+};
+document.querySelector("form .Back-to-login").onclick = () => {
+  document.querySelector("label.login").click();
+  return false;
+};
 document.querySelector("form .signup-link a").onclick = () => {
   document.querySelector("label.signup").click();
   return false;
 };
-
+//--------------------------------------------------------------------------
 document.querySelector(".close").onclick = () => {
   document.querySelector(".overlay1").classList.remove("fade-in");
   document.querySelector(".overlay1").classList.add("fade-out");

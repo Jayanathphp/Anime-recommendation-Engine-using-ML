@@ -8,6 +8,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import {
   getDatabase,
@@ -37,6 +38,7 @@ export {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
 };
 
 // Real-time database

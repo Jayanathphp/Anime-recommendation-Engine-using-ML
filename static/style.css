@@ -251,7 +251,8 @@ h2 {
 .wish-list {
   position: absolute;
   top: 97%;
-  left: 15%;
+  left: 24%;
+  font-size: 12px;
   cursor: pointer;
 }
 
@@ -663,7 +664,7 @@ button:hover::after,
   width: 100%;
   padding: 1.0625rem 0;
   z-index: 12;
-  background: rgb(255 255 255 / 95%);
+  background: rgb(255, 255, 255);
   box-shadow: -1px -4px 20px 0px #7aac85;
 }
 

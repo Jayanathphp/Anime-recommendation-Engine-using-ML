@@ -129,16 +129,21 @@ form .field input:focus::placeholder {
 .form-inner form .pass-link {
   margin-top: 5px;
 }
+.form-inner form .remembered {
+  margin-top: 5px;
+}
 .form-inner form .signup-link {
   text-align: center;
   margin-top: 30px;
 }
 .form-inner form .pass-link a,
+.form-inner form .remembered a,
 .form-inner form .signup-link a {
   color: #e5509b;
   text-decoration: none;
 }
 .form-inner form .pass-link a:hover,
+.form-inner form .remembered a:hover,
 .form-inner form .signup-link a:hover {
   text-decoration: underline;
 }
@@ -176,12 +181,4 @@ form .btn input[type="submit"] {
   font-size: 20px;
   font-weight: 500;
   cursor: pointer;
-}
-.spinner {
-  position: absolute; /* Position the spinner icon */
-  top: 25%; /* Center it vertically */
-  left: 85%; /* Center it horizontally */
-  font-size: 25px;
-  color: #000;
-  transform: translate(-50%, -50%); /* Center it precisely */
 }
