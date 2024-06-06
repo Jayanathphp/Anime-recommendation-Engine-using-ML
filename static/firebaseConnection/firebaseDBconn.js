@@ -9,6 +9,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   sendPasswordResetEmail,
+  signOut,
 } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import {
   getDatabase,
@@ -30,15 +31,16 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
+const auth = getAuth();
 const connectDB = getDatabase();
 //for firebase authentication
 export {
-  getAuth,
+  auth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
   sendPasswordResetEmail,
+  signOut,
 };
 
 // Real-time database

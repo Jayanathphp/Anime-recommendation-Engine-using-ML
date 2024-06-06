@@ -14,6 +14,55 @@ body {
 
   background: linear-gradient(179deg, #ff78e9, transparent);
 }
+/* //------------------------------------------- */
+
+.button-container {
+  display: flex;
+  margin: 20px;
+  justify-content: space-around;
+}
+
+.btn {
+  background-color: #ff66b2;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  padding: 10px 20px;
+  text-transform: uppercase;
+  margin: 20px;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #e0559e;
+}
+
+.edit-btn {
+  background-color: #4caf50; /* Green */
+}
+
+.edit-btn:hover {
+  background-color: #45a049;
+}
+#nameField {
+  padding: none;
+  border: none;
+  font-size: 15px;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+}
+#nameField:focus {
+  outline: #26a506;
+}
+.change-password-btn {
+  background-color: #f44336; /* Red */
+}
+
+.change-password-btn:hover {
+  background-color: #da190b;
+}
+/* //--------------------------- */
 #profileIcon {
   width: 100px;
   height: 100px;

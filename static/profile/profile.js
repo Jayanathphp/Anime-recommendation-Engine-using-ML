@@ -4,6 +4,7 @@ import {
   get,
   child,
   remove,
+  update,
 } from "../firebaseConnection/firebaseDBconn.js";
 
 // Notify function to show success or error messages
@@ -34,11 +35,13 @@ function NotifyUser(ErrorType, message, duration) {
     errorMessage.innerHTML = "";
   }, duration);
 }
+// Fetch user data from Firebase
+const uid = sessionStorage.getItem("userid<@#(1029384756)#@>");
 //------------------------------------------
 document.addEventListener("DOMContentLoaded", function () {
   var profileTable = document.getElementById("profileTable");
   var profileIcon = document.getElementById("profileIcon");
-  document.getElementById("Loading").innerHTML = "Fetching Data....";
+  document.getElementById("Loading").innerHTML = "Loading....";
 
   // Function to create a table row with user data
   function createTableRow(table, key, value) {
@@ -47,15 +50,50 @@ document.addEventListener("DOMContentLoaded", function () {
     const valueCell = row.insertCell(1);
 
     attributeCell.textContent = key;
-    valueCell.textContent =
-      key === "password" ? `*****${value.slice(4)}` : value;
+    if (key === "password") {
+      valueCell.textContent = `*****${value.slice(4)}`;
+    } else if (key === "UserName") {
+      valueCell.innerHTML = `
+            <input type="text" id="nameField" value="${value}" readonly />
+         `;
+      const editButton = document.querySelector(".edit-btn");
+      const nameField = document.getElementById("nameField");
+      var nameFieldval = nameField.value;
+      editButton.addEventListener("click", () => {
+        if (nameField.hasAttribute("readonly")) {
+          nameField.removeAttribute("readonly");
+          nameField.focus();
+          editButton.textContent = "Save";
+        } else {
+          if (nameField.value === nameFieldval) {
+            NotifyUser("error", "No changes...", 3000);
+          } else {
+            update(ref(connectDB, "users/" + uid), {
+              UserName: nameField.value,
+            })
+              .then(() => {
+                NotifyUser("success", "User name updated", 3000);
+                console.log("User name updated.");
+              })
+              .catch((e) => {
+                console.error("Error updating user name", e);
+              });
+          }
+          nameField.setAttribute("readonly", true);
+          editButton.textContent = "Edit";
+          // Here you can add the code to save the changes, e.g., make an API call
+        }
+      });
+    } else {
+      valueCell.textContent = value;
+    }
   }
 
   // Function to populate the profile table
   function populateProfileTable(userData) {
     const loadingElement = document.getElementById("Loading");
     loadingElement.innerHTML = "";
-
+    document.querySelector(".container").classList.remove("none");
     for (let key in userData) {
       if (userData.hasOwnProperty(key)) {
         if (
@@ -114,8 +152,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Fetch user data from Firebase
-  const uid = sessionStorage.getItem("userid<@#(1029384756)#@>");
   //remove from wishlist
   function RemoveFromWishList(animeID, wishlistItem) {
     console.log(wishlistItem);

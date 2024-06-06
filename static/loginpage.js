@@ -1,5 +1,5 @@
 import {
-  getAuth,
+  auth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -10,9 +10,9 @@ import {
   set,
   child,
   update,
+  signOut,
 } from "./firebaseConnection/firebaseDBconn.js";
 
-const auth = getAuth();
 //get user id from session storage
 const userAuthUid = sessionStorage.getItem("userid<@#(1029384756)#@>");
 //sign up form
@@ -327,10 +327,19 @@ const signOutUser = () => {
   document.querySelector("#reg_footer").classList.remove("none");
 
   updateUserStatus(userAuthUid, false);
-  sessionStorage.removeItem("userid<@#(1029384756)#@>");
-  sessionStorage.removeItem("LOgiN#@$%^&;;");
-  NotifyUser("success", "Logged out successfully.", 2000);
-  setTimeout(() => location.reload(), 2000);
+  signOut(auth)
+    .then(() => {
+      // Sign-out successful.
+      sessionStorage.removeItem("userid<@#(1029384756)#@>");
+      sessionStorage.removeItem("LOgiN#@$%^&;;");
+      NotifyUser("success", "Logged out successfully.", 2000);
+      setTimeout(() => location.reload(), 2000);
+    })
+    .catch((error) => {
+      NotifyUser("error", "Something Went Wrong Please try Agian!.", 2000);
+
+      console.log("error while sign out", error);
+    });
 };
 
 // Check if user is already authenticated
