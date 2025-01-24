@@ -14,7 +14,42 @@ body {
 
   background: linear-gradient(179deg, #ff78e9, transparent);
 }
+
+#Loading {
+  background-color: rgb(184, 170, 170);
+  padding: 10px;
+  border-radius: 2px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+
 /* //------------------------------------------- */
+.popup-input {
+  position: absolute;
+  width: 300px;
+  top: 0;
+  background-color: #bae0ff;
+  padding: 15px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  transition: all 0.5s ease-in-out;
+}
+
+.popup-input:focus {
+  transition: all 0.3s ease-in-out;
+
+  border-color: #66afe9;
+  box-shadow: 0 0 10px rgba(102, 175, 233, 0.5);
+  outline: none;
+}
+
+.popup-input::placeholder {
+  color: #999;
+}
 
 .button-container {
   display: flex;
@@ -39,11 +74,11 @@ body {
 }
 
 .edit-btn {
-  background-color: #4caf50; /* Green */
+  background-color: #1b9721; /* Green */
 }
 
 .edit-btn:hover {
-  background-color: #45a049;
+  background-color: #4caf50;
 }
 #nameField {
   padding: none;
@@ -56,12 +91,21 @@ body {
   outline: #26a506;
 }
 .change-password-btn {
-  background-color: #f44336; /* Red */
+  background-color: #da190b; /* Red */
 }
 
 .change-password-btn:hover {
-  background-color: #da190b;
+  background-color: #f44336;
 }
+
+.signout-btn {
+  background-color: #da190b; /* Red */
+}
+
+.signout-btn:hover {
+  background-color: #f44336;
+}
+
 /* //--------------------------- */
 #profileIcon {
   width: 100px;
@@ -78,6 +122,7 @@ body {
 /* Profile table */
 #profileTable {
   width: 50%;
+  position: relative;
   margin: 0 auto;
   border-collapse: collapse;
   background-color: white;
@@ -114,9 +159,8 @@ body {
   opacity: 0;
 }
 .wishlist-item:hover {
-  box-shadow: 3px 8px 7px black;
-  animation-name: sample;
-  animation-duration: 1s;
+  box-shadow: 3px 8px 7px rgb(177, 173, 173);
+  animation: 0.4s sample linear forwards;
 }
 
 .Remove-wishlist {

@@ -1,4 +1,4 @@
-import { AddtowishList, NotifyUser } from "./loginpage.js";
+import { AddtowishList, NotifyUser } from "./functions/functions.js";
 // Selecting DOM elements for navigation and overlay
 const menu = document.querySelector(".header .menu");
 const navigation = document.querySelector(".header .main-navigation");

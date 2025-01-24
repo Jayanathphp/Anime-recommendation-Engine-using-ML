@@ -4,10 +4,8 @@ import {
   connectDB,
   set,
 } from "./firebaseConnection/firebaseDBconn.js";
-import { NotifyUser } from "./loginpage.js";
-
+import { NotifyUser } from "./functions/functions.js";
 const but = document.getElementById("submit");
-
 
 function SendFeedback(Desid, name, email, desc) {
   set(ref(connectDB, "loggers/" + Desid), {
